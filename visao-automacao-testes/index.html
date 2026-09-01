@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Lucas de Queiroz">
+<meta name="description" content="Documento de Visão — plataforma de automação de testes de aceitação para sistemas transacionais.">
+<title>Visão do Produto — Automação de Testes para Sistemas Transacionais</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --ground:#F4F5F7; --surface:#FFFFFF; --surface-2:#ECEEF3;
+    --ink:#141A22; --ink-soft:#38424F; --muted:#68727F; --line:#D8DCE4;
+    --accent:#3E4FD8; --accent-ink:#2C39A8; --accent-wash:#E7E9FB;
+    --warn:#9A6510; --warn-wash:#F7EEDE; --cut:#8C4B4B; --cut-wash:#F6E9E9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116; --surface:#161B23; --surface-2:#1D242E;
+      --ink:#E8ECF2; --ink-soft:#C3CBD6; --muted:#8B96A5; --line:#28303B;
+      --accent:#8A97F5; --accent-ink:#AAB4FF; --accent-wash:#1B2140;
+      --warn:#DCA84F; --warn-wash:#2A2314; --cut:#D39A9A; --cut-wash:#2B1B1B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116; --surface:#161B23; --surface-2:#1D242E;
+    --ink:#E8ECF2; --ink-soft:#C3CBD6; --muted:#8B96A5; --line:#28303B;
+    --accent:#8A97F5; --accent-ink:#AAB4FF; --accent-wash:#1B2140;
+    --warn:#DCA84F; --warn-wash:#2A2314; --cut:#D39A9A; --cut-wash:#2B1B1B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Inter",system-ui,"Segoe UI",sans-serif;font-size:16px;line-height:1.65}
+  .page{max-width:64rem;margin:0 auto;padding:0 1.5rem 6rem}
+  h1,h2,h3{font-family:"Fraunces","Inter",serif;line-height:1.12;text-wrap:balance;margin:0}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  a{color:var(--accent-ink)}
+
+  /* topo */
+  .topbar{border-bottom:1px solid var(--line);background:var(--surface)}
+  .topbar .inner{max-width:64rem;margin:0 auto;padding:.85rem 1.5rem;
+    display:flex;justify-content:space-between;align-items:center;gap:1rem}
+  .brand{font-family:"JetBrains Mono",monospace;font-size:.75rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted)}
+  .brand b{color:var(--ink)}
+  .themetoggle{font:inherit;font-size:.8rem;cursor:pointer;color:var(--ink-soft);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:.3rem .8rem}
+
+  /* hero */
+  header.hero{padding:4.5rem 0 3rem;border-bottom:1px solid var(--line)}
+  .kicker{font-family:"JetBrains Mono",monospace;font-size:.75rem;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 1.1rem}
+  .hero h1{font-size:clamp(2.3rem,6vw,3.7rem);font-weight:700;margin-bottom:.6rem}
+  .hero .sub{font-size:1.15rem;color:var(--ink-soft);max-width:44rem;margin:0 0 2rem}
+  .hero .sub strong{color:var(--ink)}
+  .facts{display:flex;flex-wrap:wrap;gap:.5rem}
+  .fact{font-family:"JetBrains Mono",monospace;font-size:.74rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-soft);background:var(--surface);
+    border:1px solid var(--line);border-radius:999px;padding:.32rem .8rem}
+
+  /* seções */
+  section{padding-top:3.6rem}
+  .sechead{display:flex;align-items:baseline;gap:.85rem;margin-bottom:1.2rem}
+  .num{font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:600;letter-spacing:.1em;
+    color:var(--accent-ink);background:var(--accent-wash);border-radius:3px;padding:.18rem .5rem}
+  .sechead h2{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700}
+  section p{max-width:44rem;color:var(--ink-soft);margin:0 0 1rem}
+  section p strong{color:var(--ink);font-weight:600}
+
+  blockquote{margin:0;max-width:48rem;background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:1.4rem 1.6rem;
+    font-size:1.05rem;color:var(--ink-soft)}
+  blockquote strong{color:var(--ink)}
+
+  .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1.15rem 1.3rem}
+  .card .role{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:.45rem}
+  .card h3{font-size:1.05rem;font-weight:500;margin-bottom:.35rem}
+  .card p{font-size:.94rem;margin:0;color:var(--ink-soft)}
+
+  .scope{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr))}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1.25rem 1.4rem}
+  .panel h3{font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;margin-bottom:.9rem}
+  .panel.in h3{color:var(--accent-ink)}
+  .panel.out h3{color:var(--cut)}
+  .panel ul{margin:0;padding-left:1.15rem}
+  .panel li{margin-bottom:.7rem;color:var(--ink-soft);font-size:.96rem;max-width:34rem}
+  .panel li:last-child{margin-bottom:0}
+  .panel li strong{color:var(--ink);font-weight:600}
+  .panel.in li::marker{color:var(--accent)}
+  .panel.out li::marker{color:var(--cut)}
+
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+    padding:1.5rem 1.7rem;max-width:48rem}
+  .metric .big{font-family:"Fraunces",serif;font-size:clamp(1.3rem,3vw,1.7rem);font-weight:700;
+    line-height:1.25;margin:0 0 .7rem;color:var(--ink)}
+  .metric p{margin:0}
+  .pending{display:inline-block;margin-top:1rem;font-family:"JetBrains Mono",monospace;font-size:.72rem;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--warn);background:var(--warn-wash);
+    border-radius:3px;padding:.25rem .6rem}
+
+  ul.constraints{list-style:none;padding:0;margin:0;max-width:48rem}
+  ul.constraints li{border-top:1px solid var(--line);padding:1rem 0;color:var(--ink-soft)}
+  ul.constraints li:first-child{border-top:none;padding-top:0}
+  ul.constraints b{display:block;color:var(--ink);font-weight:600;font-family:"Inter",sans-serif}
+
+  figure.diagram{margin:1.5rem 0 0;background:var(--surface);border:1px solid var(--line);
+    border-radius:8px;padding:1.4rem;overflow-x:auto}
+  figure.diagram svg{display:block;min-width:34rem;width:100%;height:auto}
+  figcaption{font-size:.85rem;color:var(--muted);margin-top:.9rem}
+  .d-label{font-family:"JetBrains Mono",monospace;font-size:11px;fill:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .d-title{font-family:"Inter",sans-serif;font-size:13px;font-weight:600;fill:var(--ink)}
+  .d-sub{font-family:"Inter",sans-serif;font-size:11.5px;fill:var(--muted)}
+  .d-box{fill:var(--surface-2);stroke:var(--line)}
+  .d-box-accent{fill:var(--accent-wash);stroke:var(--accent)}
+  .d-line{stroke:var(--muted);stroke-width:1.4;fill:none}
+  .d-dash{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+
+  footer{margin-top:4.5rem;padding-top:1.5rem;border-top:1px solid var(--line);
+    color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="inner">
+  <span class="brand">Documento de Visão · <b>RUP</b></span>
+  <button class="themetoggle" id="tt" type="button">Alternar tema</button>
+</div></div>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="kicker">Visão do Produto</p>
+    <h1>Automação de Testes para Sistemas Transacionais</h1>
+    <p class="sub">Uma plataforma que sobe o sistema sob teste em sandbox, dispara transações reais contra sua API e verifica o <strong>estado que ficou no banco</strong> — para que a regressão completa deixe de ser o item cortado do cronograma.</p>
+    <div class="facts">
+      <span class="fact">Aceitação ponta a ponta</span>
+      <span class="fact">Docker + Testcontainers</span>
+      <span class="fact">Horizonte de 6 meses</span>
+      <span class="fact">2 projetos-piloto</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sechead"><span class="num">01</span><h2>Problema e Oportunidade</h2></div>
+    <p>Sistemas distribuídos e produtos com muitas regras de negócio acumulam complexidade cognitiva mais rápido do que a capacidade de testá-los à mão. Hoje a validação de aceitação depende de execução manual: cara, lenta e a primeira coisa cortada sob pressão de prazo — times acabam lançando funcionalidades de caminho crítico sem critério de teste adequado, e o defeito aparece em produção.</p>
+    <p>O problema não é falta de vontade: é que o <strong>custo de reexecutar a regressão manual cresce a cada release</strong> enquanto a janela de entrega não cresce. Dois projetos em andamento já chegaram ao ponto em que testar tudo manualmente é inviável, o que torna a automação de teste de aceitação uma necessidade imediata — não um investimento futuro.</p>
+  </section>
+
+  <section>
+    <div class="sechead"><span class="num">02</span><h2>Posicionamento</h2></div>
+    <blockquote>
+      Para <strong>times de desenvolvimento que precisam validar regras de negócio em sistemas transacionais a cada entrega</strong>, o produto é uma <strong>plataforma de testes de aceitação ponta a ponta</strong> que executa cenários de negócio contra a API e verifica o estado persistido, em ambiente sandbox descartável com massa de dados gerenciada. Diferente do <strong>teste manual guiado por planilha de roteiros</strong> — que não é repetível e é a primeira coisa cortada sob pressão de prazo — a plataforma torna a regressão completa barata o suficiente para rodar em toda mudança.
+    </blockquote>
+  </section>
+
+  <section>
+    <div class="sechead"><span class="num">03</span><h2>Usuários-Alvo</h2></div>
+    <div class="grid">
+      <div class="card"><span class="role">Escreve e roda</span><h3>Desenvolvedor do time</h3><p>Precisa de feedback rápido e confiável antes do merge, sem montar setup e massa de dados a cada teste.</p></div>
+      <div class="card"><span class="role">Dono da estratégia</span><h3>Quality Engineer / QA</h3><p>Precisa de uma suíte de regressão que cubra regra de negócio de verdade e que não seja <em>flaky</em>.</p></div>
+      <div class="card"><span class="role">Especifica e confere</span><h3>Product Owner / Analista</h3><p>Precisa enxergar que o critério de aceite que especificou está de fato verificado.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><span class="num">04</span><h2>Escopo</h2></div>
+    <div class="scope">
+      <div class="panel in">
+        <h3>Dentro do produto</h3>
+        <ul>
+          <li><strong>Cenários a partir do contrato real da requisição</strong> (request/response <em>as is</em>), sem exigir tradução para uma linguagem intermediária tipo Gherkin.</li>
+          <li><strong>Execução contra a API e verificação do estado persistido</strong> — mesmo quando uma requisição se desdobra em várias entidades ou múltiplos schemas.</li>
+          <li><strong>Massa de dados e ambiente efêmero</strong>: sobe o SUT e suas dependências, <em>stuba</em> os sistemas externos, prepara e limpa o estado a cada execução, para que a suíte seja repetível.</li>
+        </ul>
+      </div>
+      <div class="panel out">
+        <h3>Fora do produto</h3>
+        <ul>
+          <li><strong>Teste de UI / navegador</strong> — camada frágil e cara; o alvo é regra de negócio e dado, não tela.</li>
+          <li><strong>Teste de carga e performance</strong> — outro objetivo e outra infraestrutura.</li>
+          <li><strong>Teste unitário</strong> — segue como responsabilidade do desenvolvedor no próprio projeto (TDD); o produto não compete com isso.</li>
+          <li><strong>Execução contra produção</strong> — apenas ambientes controlados, nunca dado real de cliente.</li>
+        </ul>
+      </div>
+    </div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 720 250" role="img" aria-label="Diagrama: a plataforma monta um sandbox com o SUT e stubs, dispara requisições e verifica o estado persistido no banco.">
+        <rect x="8" y="60" width="132" height="66" rx="6" class="d-box-accent"/>
+        <text x="74" y="88" text-anchor="middle" class="d-title">Plataforma</text>
+        <text x="74" y="107" text-anchor="middle" class="d-sub">cenários + massa</text>
+
+        <rect x="196" y="16" width="392" height="218" rx="10" class="d-box" fill="none"/>
+        <text x="212" y="38" class="d-label">Sandbox efêmero (Docker)</text>
+
+        <rect x="222" y="60" width="150" height="66" rx="6" class="d-box"/>
+        <text x="297" y="88" text-anchor="middle" class="d-title">SUT</text>
+        <text x="297" y="107" text-anchor="middle" class="d-sub">imagens dos componentes</text>
+
+        <rect x="424" y="60" width="140" height="66" rx="6" class="d-box"/>
+        <text x="494" y="88" text-anchor="middle" class="d-title">Stubs</text>
+        <text x="494" y="107" text-anchor="middle" class="d-sub">sistemas externos</text>
+
+        <rect x="222" y="158" width="150" height="58" rx="6" class="d-box"/>
+        <text x="297" y="184" text-anchor="middle" class="d-title">Banco</text>
+        <text x="297" y="202" text-anchor="middle" class="d-sub">estado persistido</text>
+
+        <path d="M140 84 H 214" class="d-line" marker-end="url(#a)"/>
+        <text x="177" y="76" text-anchor="middle" class="d-label">requisição</text>
+        <path d="M372 93 H 418" class="d-line" marker-end="url(#a)"/>
+        <path d="M297 126 V 152" class="d-line" marker-end="url(#a)"/>
+        <path d="M222 187 H 74 V 132" class="d-dash" marker-end="url(#a)"/>
+        <text x="120" y="205" text-anchor="middle" class="d-label">asserção de estado</text>
+
+        <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="currentColor" style="color:var(--muted)"/></marker></defs>
+      </svg>
+      <figcaption>O ciclo de uma execução: a plataforma orquestra o sandbox, dispara a transação contra o SUT e valida tanto a resposta quanto o que ficou no banco.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="sechead"><span class="num">05</span><h2>Medida de Sucesso</h2></div>
+    <div class="metric">
+      <p class="big">Percentual de releases entregues com a suíte de aceitação verde.</p>
+      <p>Releases em que a regressão foi <strong>efetivamente executada e passou</strong>, em vez de pulada por pressão de prazo. É a métrica que fecha o ciclo com o problema: o produto só está funcionando quando testar deixou de ser o item cortado do cronograma.</p>
+      <span class="pending">Meta numérica a definir com a linha de base dos projetos atuais</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><span class="num">06</span><h2>Restrições Vinculantes</h2></div>
+    <ul class="constraints">
+      <li><b>Docker + Testcontainers como mecanismo de execução</b>Orquestra o sandbox via compose a partir das imagens dos componentes do SUT. Corta opções: todo sistema testável precisa ser distribuível como imagem de container.</li>
+      <li><b>Horizonte de 6 meses</b>Prazo para estar em uso nos dois projetos que já não conseguem testar manualmente.</li>
+      <li><b>Sem restrição de dado</b>Assume-se ambiente exclusivamente não produtivo, sem dado real de cliente.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Lucas de Queiroz · Documento de Visão</span>
+    <span class="mono">v1 — set/2026</span>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    var b=document.getElementById('tt');
+    b.addEventListener('click',function(){
+      var cur=document.documentElement.getAttribute('data-theme');
+      if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+      document.documentElement.setAttribute('data-theme',cur==='dark'?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>
