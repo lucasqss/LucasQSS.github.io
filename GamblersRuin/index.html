@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Lucas de Queiroz">
+  <meta name="description" content="Simulação da ruína do apostador (gambler's ruin) com N apostadores: com o tempo, toda a riqueza acaba nas mãos de um só.">
+  <title>Gambler's Ruin com N apostadores</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="back" href="../index.html">&larr; Início</a>
+      <h1>Gambler's Ruin com <span class="accent">N</span> apostadores</h1>
+      <p class="lead">
+        Um jogo <strong>justo</strong>, sem vantagem para ninguém. Mesmo assim, se ele durar o bastante,
+        <strong>toda a riqueza termina nas mãos de um único apostador</strong> — todos os outros quebram.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ CONTROLES ============ -->
+    <section class="panel" aria-label="Parâmetros">
+      <div class="controls">
+        <label>Apostadores (N)
+          <input id="inN" type="number" min="2" max="100" value="8">
+        </label>
+        <label>Fichas iniciais por jogador
+          <input id="inW" type="number" min="1" max="200" value="20">
+        </label>
+        <label>Distribuição inicial
+          <select id="inInit">
+            <option value="equal">Igual para todos</option>
+            <option value="random">Aleatória (mesma soma)</option>
+            <option value="ramp">Progressiva (1 : 2 : 3 …)</option>
+          </select>
+        </label>
+        <label>Aposta por rodada
+          <select id="inStake">
+            <option value="unit">1 ficha</option>
+            <option value="allin">Tudo do mais pobre dos dois</option>
+          </select>
+        </label>
+        <label>Semente (seed)
+          <span class="seedrow">
+            <input id="inSeed" type="number" value="42">
+            <button id="btnSeed" type="button" title="Sortear nova semente" aria-label="Sortear nova semente">🎲</button>
+          </span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="btnPlay" class="primary" type="button">▶ Iniciar</button>
+        <button id="btnStep" type="button">+1 rodada</button>
+        <button id="btnEnd" type="button">⏭ Ir até o fim</button>
+        <button id="btnReset" type="button">↺ Reiniciar</button>
+        <label class="speed">Velocidade
+          <input id="inSpeed" type="range" min="0" max="100" value="55">
+          <output id="outSpeed"></output>
+        </label>
+        <label class="check"><input id="inLog" type="checkbox"> tempo em escala log</label>
+      </div>
+    </section>
+
+    <!-- ============ ESTATÍSTICAS ============ -->
+    <section class="stats" aria-live="polite">
+      <div class="stat"><span class="k">Rodadas</span><span class="v" id="sSteps">0</span></div>
+      <div class="stat"><span class="k">Ainda no jogo</span><span class="v" id="sAlive">–</span></div>
+      <div class="stat"><span class="k">Líder</span><span class="v" id="sLeader">–</span></div>
+      <div class="stat"><span class="k">Participação do líder</span><span class="v" id="sShare">–</span></div>
+      <div class="stat"><span class="k">Nº efetivo de jogadores</span><span class="v" id="sNeff">–</span><span class="hint">1 / Σ(parte²)</span></div>
+      <div class="stat"><span class="k">Fichas em jogo</span><span class="v" id="sTotal">–</span><span class="hint">constante</span></div>
+    </section>
+
+    <div id="banner" class="banner" hidden></div>
+
+    <!-- ============ GRÁFICOS ============ -->
+    <section class="panel">
+      <h2>Riqueza de cada apostador ao longo do tempo</h2>
+      <canvas id="cvWealth" class="chart tall" aria-label="Riqueza de cada apostador ao longo do tempo"></canvas>
+    </section>
+
+    <div class="two">
+      <section class="panel">
+        <h2>Riqueza agora</h2>
+        <canvas id="cvBars" class="chart" aria-label="Riqueza atual de cada apostador"></canvas>
+        <p class="note">Escala ajustada ao maior valor atual.</p>
+      </section>
+      <section class="panel">
+        <h2>Concentração: parte do líder no total</h2>
+        <canvas id="cvShare" class="chart" aria-label="Participação do líder ao longo do tempo"></canvas>
+        <p class="note">A linha tracejada é a parte "justa" (1/N). A meta do jogo é 100%.</p>
+      </section>
+    </div>
+
+    <!-- ============ MONTE CARLO ============ -->
+    <section class="panel">
+      <h2>Quem vence? Monte Carlo</h2>
+      <p>
+        O jogo é uma <em>martingale</em>: a riqueza esperada de cada um nunca muda. Logo, a chance de o jogador <em>i</em>
+        ser o último de pé é exatamente <code>wᵢ / T</code> (sua fatia inicial). Rode muitos jogos completos com a
+        configuração inicial atual e compare a frequência observada com a teoria.
+      </p>
+      <div class="actions">
+        <label>Nº de jogos
+          <input id="inRuns" type="number" min="10" max="200000" value="2000">
+        </label>
+        <button id="btnMC" class="primary" type="button">Rodar Monte Carlo</button>
+        <button id="btnMCStop" type="button" disabled>Parar</button>
+        <span id="mcProgress" class="muted"></span>
+      </div>
+      <canvas id="cvMC" class="chart" aria-label="Frequência de vitórias observada versus teórica"></canvas>
+      <div class="legend">
+        <span><i class="sw obs"></i> observado</span>
+        <span><i class="sw theo"></i> teoria (wᵢ / T)</span>
+      </div>
+      <p id="mcSummary" class="note"></p>
+    </section>
+
+    <!-- ============ EXPLICAÇÃO ============ -->
+    <section class="panel prose">
+      <h2>Como a simulação funciona</h2>
+      <ol>
+        <li>Cada jogador começa com uma quantidade de fichas; o total <em>T</em> nunca muda.</li>
+        <li>A cada rodada, dois jogadores ainda vivos são sorteados uniformemente.</li>
+        <li>Eles apostam (1 ficha, ou tudo o que o mais pobre dos dois tem) numa <strong>moeda honesta</strong>: 50% / 50%.</li>
+        <li>Quem perde entrega a aposta a quem ganha. Quem chega a zero está arruinado e sai do jogo para sempre.</li>
+        <li>O jogo só termina quando sobra um único jogador com as <em>T</em> fichas.</li>
+      </ol>
+
+      <h2>Por que sempre sobra um só?</h2>
+      <ul>
+        <li><strong>Os únicos estados "parados"</strong> são aqueles em que um jogador tem tudo. Enquanto houver dois jogadores com fichas, existe chance positiva de alguém ser arruinado em poucas rodadas.</li>
+        <li>Como o número de configurações possíveis é finito, o processo é absorvido nesses estados com <strong>probabilidade 1</strong> quando o tempo tende a infinito.</li>
+        <li>A <strong>média</strong> de fichas por jogador é sempre <code>T/N</code> — mas ela deixa de descrever qualquer pessoa real. No fim, um tem <code>T</code> e todos os outros têm <code>0</code>. Por isso o "nº efetivo de jogadores" cai de <em>N</em> até <em>1</em>.</li>
+        <li>Equidade não impede concentração: o que sustenta a ruína é a <strong>fronteira absorvente em zero</strong>, e não uma vantagem de alguém.</li>
+        <li>Com 2 jogadores e aposta de 1 ficha, o tempo esperado até a ruína é <code>a · b</code> rodadas (<em>a</em> e <em>b</em> são as fichas iniciais).</li>
+      </ul>
+      <p class="muted">Dica: com a aposta de "1 ficha" e muitos jogadores, o fim demora (a ordem é de T² rodadas). O modo "tudo do mais pobre" acelera bastante.</p>
+    </section>
+
+  </main>
+
+  <footer class="wrap foot">
+    <span>Feito com HTML, CSS e JavaScript puros — sem dependências.</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
